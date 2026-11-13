@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face{font-family:'SG';src:url('{{ fonts }}/SpaceGrotesk.ttf') format('truetype');font-weight:300 700}
+@font-face{font-family:'JBM';src:url('{{ fonts }}/JetBrainsMono.ttf') format('truetype');font-weight:100 800}
+*{box-sizing:border-box}
+body{margin:0;background:#0B1020}
+.slide{position:relative;width:1080px;height:1350px;overflow:hidden;background-color:#0B1020;
+  background-image:radial-gradient(rgba(148,163,184,.11) 1.5px,transparent 1.6px);background-size:40px 40px;
+  font-family:'SG',sans-serif;color:#F8FAFC;padding:72px 80px 64px;display:flex;flex-direction:column}
+.halo{position:absolute;right:-260px;top:-260px;width:760px;height:760px;border-radius:50%;
+  background:radial-gradient(circle,{{ accent }}22 0%,transparent 65%);pointer-events:none}
+.top{display:flex;justify-content:space-between;align-items:center;position:relative}
+.kicker{font-family:'JBM',monospace;font-size:22px;letter-spacing:.14em;color:{{ accent }};
+  border:2px solid {{ accent }};border-radius:999px;padding:10px 22px;text-transform:uppercase}
+.count{font-family:'JBM',monospace;font-size:24px;color:#94A3B8}
+.progress{position:relative;height:6px;border-radius:3px;background:#1E2742;margin-top:28px}
+.progress span{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:{{ accent }}}
+.main{--k:1;flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:safe center;
+  gap:calc(30px*var(--k));position:relative;padding:24px 0}
+.hl{color:{{ accent }}}
+.main>*{flex-shrink:0}  /* never squeeze a block (e.g. the code box); overflow must show so fitAll can shrink text */
+.idx{font-family:'SG',sans-serif;font-weight:700;font-size:calc(170px*var(--k));line-height:.8;color:transparent;-webkit-text-stroke:3px {{ accent }};opacity:.6;letter-spacing:-.02em}
+h1{margin:0;font-weight:700;letter-spacing:-.03em;line-height:.98;font-size:calc(150px*var(--k))}
+h2{margin:0;font-weight:700;letter-spacing:-.02em;line-height:1.05;font-size:calc(86px*var(--k))}
+.sub{margin:0;font-size:calc(44px*var(--k));line-height:1.3;color:#C3CCDD}
+.body{margin:0;font-size:calc(43px*var(--k));line-height:1.42;color:#C3CCDD;overflow-wrap:anywhere}
+ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:calc(18px*var(--k))}
+li{font-size:calc(41px*var(--k));line-height:1.3;display:flex;gap:18px;align-items:baseline}
+li::before{content:"";flex:0 0 14px;height:14px;border-radius:3px;background:{{ accent }};transform:translateY(-4px)}
+.code{background:#080C18;border:2px solid #2A3658;border-radius:24px;overflow:hidden}
+.code .bar{display:flex;gap:10px;padding:16px 22px;background:#121A33}
+.code .bar i{width:14px;height:14px;border-radius:50%;display:block}
+.code pre{margin:0;padding:calc(24px*var(--k)) 28px;font-family:'JBM',monospace;font-size:calc(36px*var(--k));
+  line-height:1.45;color:#E2E8F0;white-space:pre;overflow:hidden}
+.code pre b{color:#22C55E;font-weight:600}
+.cols{display:grid;gap:22px}
+.card{background:#121A33;border:2px solid #2A3658;border-radius:28px;padding:calc(30px*var(--k)) 26px;
+  display:flex;flex-direction:column;gap:calc(16px*var(--k))}
+.card .name{font-size:calc(48px*var(--k));font-weight:700;color:{{ accent }}}
+.card .line{font-size:calc(32px*var(--k));line-height:1.3;color:#C3CCDD}
+.foot{display:flex;justify-content:space-between;align-items:center;position:relative}
+.brand{display:flex;align-items:center;gap:12px;font-family:'JBM',monospace;font-size:24px;color:#C3CCDD}
+.swipe{display:flex;align-items:center;gap:10px;font-family:'JBM',monospace;font-size:24px;color:{{ accent }}}
+.pill{align-self:flex-start;font-size:calc(42px*var(--k));font-weight:600;padding:22px 40px;border-radius:999px;
+  border:3px solid #22D3EE;background:rgba(34,211,238,.12)}
+.actions{display:flex;gap:16px;flex-wrap:wrap}
+.actions span{font-family:'JBM',monospace;font-size:26px;color:#C3CCDD;border:2px solid #2A3658;border-radius:999px;padding:10px 22px}
+</style>
+</head>
+<body>
+{% macro logo(size) -%}
+<svg viewBox="0 0 200 200" width="{{ size }}" height="{{ size }}" aria-hidden="true"><path d="M70 50 C56 50 55 60 55 74 L55 88 C55 96 50 100 41 100 C50 100 55 104 55 112 L55 126 C55 140 56 150 70 150" fill="none" stroke="#22D3EE" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><path d="M130 50 C144 50 145 60 145 74 L145 88 C145 96 150 100 159 100 C150 100 145 104 145 112 L145 126 C145 140 144 150 130 150" fill="none" stroke="#22D3EE" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><rect x="90" y="96" width="20" height="20" rx="4" fill="#F59E0B"/><circle cx="77" cy="108" r="8" fill="#F8FAFC"/><circle cx="85" cy="84" r="8" fill="#F8FAFC"/><circle cx="115" cy="84" r="8" fill="#F8FAFC"/><circle cx="123" cy="108" r="8" fill="#F8FAFC"/></svg>
+{%- endmacro %}
+{% macro chrome_top(i) -%}
+<div class="halo"></div>
+<div class="top"><div class="kicker">{{ kicker }}</div><div class="count">{{ '%02d' % i }} / {{ '%02d' % total }}</div></div>
+<div class="progress"><span style="width:{{ (100 * i / total) | round(1) }}%"></span></div>
+{%- endmacro %}
+{% macro chrome_foot(last=False) -%}
+<div class="foot"><div class="brand">{{ logo(52) }}<span>{{ handle }}</span></div>
+{% if not last %}<div class="swipe">Swipe<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>{% endif %}
+</div>
+{%- endmacro %}
+
+<section class="slide" id="s1">
+  {{ chrome_top(1) }}
+  <div class="main" data-fit>
+    {{ logo(150) }}
+    <h1>{{ post.cover.title | hl }}</h1>
+    {% if post.cover.subtitle %}<p class="sub">{{ post.cover.subtitle }}</p>{% endif %}
+  </div>
+  {{ chrome_foot() }}
+</section>
+
+{% for s in post.slides %}
+<section class="slide" id="s{{ loop.index + 1 }}">
+  {{ chrome_top(loop.index + 1) }}
+  <div class="main" data-fit>
+    <div class="idx">{{ '%02d' % loop.index }}</div>
+    <h2>{{ s.title | hl }}</h2>
+    {% if s.type == 'compare' %}
+      <div class="cols" style="grid-template-columns:repeat({{ s.columns | length }},minmax(0,1fr))">
+      {% for c in s.columns %}
+        <div class="card"><div class="name">{{ c.name }}</div>
+        {% for l in c.lines %}<div class="line">{{ l }}</div>{% endfor %}</div>
+      {% endfor %}
+      </div>
+    {% else %}
+      {% if s.body %}<p class="body">{{ s.body | hl }}</p>{% endif %}
+      {% if s.bullets %}<ul>{% for b in s.bullets %}<li>{{ b | hl }}</li>{% endfor %}</ul>{% endif %}
+      {% if s.code %}<div class="code"><div class="bar"><i style="background:#EF4444"></i><i style="background:#F59E0B"></i><i style="background:#22C55E"></i></div><pre>{{ s.code | codefmt }}</pre></div>{% endif %}
+    {% endif %}
+  </div>
+  {{ chrome_foot() }}
+</section>
+{% endfor %}
+
+<section class="slide" id="s{{ total }}">
+  {{ chrome_top(total) }}
+  <div class="main" data-fit>
+    <svg viewBox="0 0 24 24" width="120" height="120" fill="rgba(245,158,11,.18)" stroke="#F59E0B" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg>
+    <h1 style="font-size:calc(112px*var(--k))">{{ post.cta.title | hl }}</h1>
+    {% if post.cta.subtitle %}<p class="sub">{{ post.cta.subtitle }}</p>{% endif %}
+    <div class="pill">Follow {{ handle }}</div>
+    <div class="actions"><span>Save</span><span>Share</span><span>Comment</span></div>
+  </div>
+  {{ chrome_foot(True) }}
+</section>
+
+<script>
+// Shrink text until each slide fits, then report anything that still overflows.
+window.fitAll = () => {
+  const report = [];
+  document.querySelectorAll('.slide').forEach((slide, i) => {
+    const main = slide.querySelector('.main');
+    let k = 1;
+    const tooBig = () => main.scrollHeight > main.clientHeight + 1 ||
+      [...main.querySelectorAll('pre, h1, h2')].some(e => e.scrollWidth > e.clientWidth + 1) ||
+      [...main.querySelectorAll('pre')].some(e => e.scrollHeight > e.clientHeight + 1);
+    while (tooBig() && k > 0.62) { k = +(k - 0.03).toFixed(2); main.style.setProperty('--k', k); }
+    const problems = [];
+    if (main.scrollHeight > main.clientHeight + 1) problems.push('text taller than the slide');
+    main.querySelectorAll('pre').forEach(p => { if (p.scrollWidth > p.clientWidth + 1) problems.push('code line too wide');
+      if (p.scrollHeight > p.clientHeight + 1) problems.push('code box cut off'); });
+    main.querySelectorAll('h1, h2').forEach(h => { if (h.scrollWidth > h.clientWidth + 1) problems.push('a title word is too long'); });
+    report.push({slide: i + 1, scale: k, problems});
+  });
+  return report;
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ByteBaithak Dashboard</title>
+<style>
+:root{--bg:#0B1020;--panel:#121A33;--line:#2A3658;--ink:#F8FAFC;--ink2:#C3CCDD;--muted:#94A3B8;
+  --cyan:#22D3EE;--violet:#8B5CF6;--amber:#F59E0B;--green:#22C55E;--red:#EF4444}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,sans-serif}
+a{color:var(--cyan)}
+.wrap{max-width:1240px;margin:0 auto;padding:24px}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:20px}
+h1{margin:0;font-size:26px} h1 span{color:var(--cyan)}
+h2{font-size:19px;margin:0 0 14px} h3{font-size:15px;margin:0 0 8px;color:var(--ink2)}
+.muted{color:var(--muted)} .small{font-size:13px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:20px}
+.grid{display:grid;gap:14px}
+.tiles{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.tile .n{font-size:28px;font-weight:700} .tile .l{color:var(--muted);font-size:13px}
+.badge{display:inline-flex;gap:6px;align-items:center;border-radius:999px;padding:3px 10px;font-size:12px;
+  font-weight:600;border:1px solid currentColor;white-space:nowrap}
+.s-published{color:var(--green)} .s-pending_approval{color:var(--amber)} .s-approved{color:var(--cyan)}
+.s-failed_check,.s-publish_failed{color:var(--red)} .s-scheduled,.s-skipped,.s-rejected{color:var(--muted)}
+.s-drafting{color:var(--violet)} .s-manual,.s-dry_run{color:var(--ink2)}
+.live{color:var(--green)} .dry{color:var(--amber)}
+.btn{display:inline-flex;gap:6px;align-items:center;cursor:pointer;border:1px solid var(--line);background:#0E1530;
+  color:var(--ink);border-radius:10px;padding:6px 12px;font:inherit;font-size:13px;text-decoration:none}
+.btn:hover{border-color:var(--cyan)} .btn.ok{border-color:var(--green)} .btn.no{border-color:var(--red)}
+form{display:inline}
+.day{margin-bottom:18px} .day h3{margin-bottom:10px}
+.cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}
+.card{display:flex;gap:14px;background:#0E1530;border:1px solid var(--line);border-radius:14px;padding:12px}
+.card img{width:96px;height:120px;object-fit:cover;border-radius:8px;background:#000;flex:none}
+.card .ph{width:96px;height:120px;border-radius:8px;border:1px dashed var(--line);display:grid;place-items:center;
+  color:var(--muted);font-size:12px;flex:none;text-align:center}
+.card .body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.topic{font-weight:600}
+.card .body a{overflow-wrap:anywhere}
+.note{font-size:12px;color:var(--amber)} .err{font-size:12px;color:var(--red);word-break:break-word}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.two{grid-template-columns:repeat(auto-fit,minmax(460px,1fr))}
+.chart .lbl{fill:var(--ink2);font-size:13px} .chart .val{fill:var(--ink);font-size:13px;font-weight:600}
+.chart .fill{fill:var(--cyan)} .chart .bar:hover .fill{fill:#67E8F9}
+.progress{height:10px;background:#1E2742;border-radius:5px;overflow:hidden;margin:8px 0 14px}
+.progress span{display:block;height:100%;background:var(--green)}
+.flash{background:rgba(34,211,238,.1);border:1px solid var(--cyan);border-radius:12px;padding:10px 14px;margin-bottom:16px}
+.log{font:12px/1.5 Consolas,monospace;color:var(--ink2);white-space:pre-wrap;word-break:break-all;margin:0}
+details summary{cursor:pointer;color:var(--muted)}
+</style>
+</head>
+<body>
+{% macro badge(status) -%}
+{%- set icons = {"published":"✔","pending_approval":"⏳","approved":"👍","failed_check":"✖","publish_failed":"✖",
+   "scheduled":"🗓","drafting":"✍","manual":"🎥","rejected":"🚫","skipped":"⏭","dry_run":"🧪"} -%}
+{%- set names = {"published":"Published","pending_approval":"Approval chahiye","approved":"Approved",
+   "failed_check":"Check fail","publish_failed":"Publish fail","scheduled":"Scheduled","drafting":"Ban rahi hai",
+   "manual":"Khud banani hai","rejected":"Rejected","skipped":"Skipped","dry_run":"Dry run"} -%}
+<span class="badge s-{{ status }}">{{ icons.get(status, "•") }} {{ names.get(status, status) }}</span>
+{%- endmacro %}
+{% macro share(url, text) -%}
+<button class="btn" type="button" onclick='copyLink({{ url | tojson }}, this)'>📋 Copy link</button>
+<button class="btn native-share" type="button" hidden onclick='nativeShare({{ url | tojson }}, {{ text | tojson }})'>📤 Share</button>
+<a class="btn" target="_blank" rel="noopener" href="https://wa.me/?text={{ (text ~ ' ' ~ url) | q }}">WhatsApp</a>
+<a class="btn" target="_blank" rel="noopener" href="https://www.linkedin.com/sharing/share-offsite/?url={{ url | q }}">LinkedIn</a>
+<a class="btn" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u={{ url | q }}">Facebook</a>
+<a class="btn" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url={{ url | q }}&text={{ text | q }}">X</a>
+{%- endmacro %}
+{% macro act(do, id, label, cls="") -%}
+<form method="post" action="/action"><input type="hidden" name="token" value="{{ token }}">
+<input type="hidden" name="do" value="{{ do }}"><input type="hidden" name="id" value="{{ id }}">
+<button class="btn {{ cls }}" type="submit"{% if do in ("ok", "no") %} onclick="return confirm('{{ label }}: {{ id }}?')"{% endif %}>{{ label }}</button></form>
+{%- endmacro %}
+
+<div class="wrap">
+<header>
+  <div>
+    <h1>Byte<span>Baithak</span> Dashboard</h1>
+    <div class="muted small">{{ now }} · Instagram numbers updated {{ live_at or "abhi nahi" }} (har 30 min) · page khud refresh hota hai</div>
+  </div>
+  <div class="row">
+    {% if S.dry_run %}<span class="badge dry">🧪 DRY RUN</span>{% else %}<span class="badge live">● LIVE</span>{% endif %}
+    {% if paused %}<span class="badge s-failed_check">⏸ PAUSED</span>{{ act("resume", "", "▶ Resume posting") }}
+    {% else %}{{ act("pause", "", "⏸ Pause posting") }}{% endif %}
+    <span class="badge s-scheduled">Approval: {{ S.approval_mode }}</span>
+  </div>
+</header>
+
+{% if msg %}<div class="flash">{{ msg }}</div>{% endif %}
+
+<div class="grid tiles" style="margin-bottom:20px">
+  <div class="tile"><div class="n">{{ "{:,}".format(account.followers_count) if account.followers_count is number else "–" }}</div><div class="l">Followers</div></div>
+  <div class="tile"><div class="n">{{ account.media_count if account.media_count is number else "–" }}</div><div class="l">Posts on Instagram</div></div>
+  <div class="tile"><div class="n">{{ "{:,}".format(totals.reach) }}</div><div class="l">Total reach (published posts)</div></div>
+  <div class="tile"><div class="n">{{ "{:,}".format(totals.views) }}</div><div class="l">Total views</div></div>
+  <div class="tile"><div class="n">{{ "{:,}".format(totals.saved + totals.shares) }}</div><div class="l">Saves + shares</div></div>
+  <div class="tile"><div class="n">{{ quota[0] if quota[0] is not none else "–" }}<span class="muted" style="font-size:16px"> / {{ quota[1] or "–" }}</span></div><div class="l">Instagram limit (24 ghante)</div></div>
+</div>
+
+<section class="panel">
+  <h2>🔗 Profile share karein</h2>
+  <div class="row"><a href="{{ profile }}" target="_blank" rel="noopener">{{ profile }}</a></div>
+  <div class="row" style="margin-top:10px">{{ share(profile, "Learn AI, DevOps, Cloud and coding step by step: follow " ~ S.handle) }}</div>
+</section>
+
+<section class="panel">
+  <h2>📅 Aaj aur agle 3 din ki posts</h2>
+  {% for day, items in days %}
+  <div class="day"><h3>{{ day }}</h3><div class="cards">
+    {% for p in items %}
+    <div class="card">
+      {% if p.thumb %}<a href="{{ p.video or p.thumb }}" target="_blank"><img src="{{ p.thumb }}" alt="preview"></a>
+      {% else %}<div class="ph">{{ "Reel" if p.format == "reel" else "Carousel" }}<br>abhi bani nahi</div>{% endif %}
+      <div class="body">
+        <div class="row"><b>{{ p.slot }}</b><span class="muted small">{{ "🎬 Reel" if p.format == "reel" else "🖼 Carousel" }} · {{ pillar_names.get(p.pillar, p.pillar) }}</span></div>
+        <div class="topic">{{ p.shown_topic }}</div>
+        <div>{{ badge(p.status) }}</div>
+        {% for n in p.notes[:3] %}<div class="note">⚠ {{ n }}</div>{% endfor %}
+        {% if p.error and p.status in ("failed_check", "publish_failed", "skipped") %}<div class="err">{{ p.error[:220] }}</div>{% endif %}
+        <div class="row">
+          {% if p.status == "pending_approval" %}{{ act("ok", p.id, "✅ Approve", "ok") }}{{ act("no", p.id, "❌ Reject", "no") }}{% endif %}
+          {% if p.status in ("failed_check", "publish_failed", "skipped", "drafting") %}{{ act("retry", p.id, "🔁 Retry") }}{% endif %}
+          {% if p.status == "rejected" %}{{ act("ok", p.id, "✅ Approve", "ok") }}{% endif %}
+          {% if p.video %}<a class="btn" href="{{ p.video }}" target="_blank">▶ Reel dekhein</a>{% endif %}
+        </div>
+        {% if p.permalink %}<div class="row"><a class="small" href="{{ p.permalink }}" target="_blank" rel="noopener">{{ p.permalink }}</a></div>
+        <div class="row">{{ share(p.permalink, p.shown_topic ~ " via " ~ S.handle) }}</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div></div>
+  {% else %}<p class="muted">Calendar mein in dinon ki koi post nahi.</p>{% endfor %}
+</section>
+
+<section class="panel">
+  <h2>📈 Instagram performance</h2>
+  <div class="grid two">
+    <div><h3>Reach per post</h3>{{ reach_chart }}</div>
+    <div><h3>Average reach per pillar</h3>{{ pillar_chart }}</div>
+  </div>
+  {% if perf %}
+  <details open style="margin-top:14px"><summary>Table</summary>
+  <table><thead><tr><th>Date</th><th>Post</th><th class="num">Reach</th><th class="num">Views</th><th class="num">Likes</th>
+  <th class="num">Comments</th><th class="num">Saves</th><th class="num">Shares</th><th>Share</th></tr></thead><tbody>
+  {% for p in perf | sort(attribute="date", reverse=True) %}
+  <tr><td>{{ p.date }}</td><td><a href="{{ p.permalink }}" target="_blank" rel="noopener">{{ p.topic }}</a>
+    <div class="muted small">{{ "Reel" if p.format == "reel" else "Carousel" }} · {{ pillar_names.get(p.pillar, p.pillar) }}</div></td>
+  <td class="num">{{ "{:,}".format(p.reach) }}</td><td class="num">{{ "{:,}".format(p.views) }}</td><td class="num">{{ p.likes }}</td>
+  <td class="num">{{ p.comments }}</td><td class="num">{{ p.saved }}</td><td class="num">{{ p.shares }}</td>
+  <td><button class="btn" type="button" onclick='copyLink({{ p.permalink | tojson }}, this)'>📋 Copy</button></td></tr>
+  {% endfor %}</tbody></table></details>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h2>🎓 Course progress</h2>
+  {% for c in courses %}
+    <h3>{{ c.name }} course · {{ c.done }} / {{ c.total }} lessons published</h3>
+    <div class="progress"><span style="width:{{ (100 * c.done / c.total) | round(1) if c.total else 0 }}%"></span></div>
+    {% if c.next %}<p class="small">Agla lesson: <b>L{{ c.next.n }} · {{ c.next.lesson }}</b> — {{ c.next.date }} {{ c.next.slot }}</p>{% endif %}
+    <table><thead><tr><th>Lesson</th><th>Topic</th><th>Date</th><th>Status</th></tr></thead><tbody>
+    {% for l in c.lessons %}<tr><td>L{{ l.n }}</td><td>{% if l.permalink %}<a href="{{ l.permalink }}" target="_blank">{{ l.lesson }}</a>{% else %}{{ l.lesson }}{% endif %}</td>
+    <td>{{ l.date }} {{ l.slot }}</td><td>{{ badge(l.status) }}</td></tr>{% endfor %}
+    </tbody></table>
+  {% else %}<p class="muted">Calendar mein abhi koi "… Course L1: …" lesson nahi.</p>{% endfor %}
+</section>
+
+<section class="panel">
+  <h2>🗓 Calendar (aage ki posts)</h2>
+  <table><thead><tr><th>Date</th><th>Time</th><th>Type</th><th>Pillar</th><th>Topic</th><th>Status</th></tr></thead><tbody>
+  {% for r in calendar %}<tr><td>{{ r.date }}</td><td>{{ r.slot }}</td><td>{{ "🎬 Reel" if r.format == "reel" else "🖼 Carousel" }}</td>
+  <td>{{ pillar_names.get(r.pillar, r.pillar) }}</td><td>{{ r.shown_topic }}</td><td>{{ badge(r.status) }}</td></tr>{% endfor %}
+  </tbody></table>
+  <p class="muted small">Calendar badalne ke liye <code>data/calendar.csv</code> edit karein.</p>
+</section>
+
+<section class="panel">
+  <h2>🩺 Bot health</h2>
+  <table><tbody>
+    <tr><th>Bot</th><td><span class="badge live">● Chal raha hai</span> <span class="muted small">(ye page bot hi dikha raha hai)</span></td></tr>
+    <tr><th>Mode</th><td>{% if S.dry_run %}🧪 DRY RUN — Instagram par post nahi hoti{% else %}● LIVE — approved posts Instagram par jaati hain{% endif %}{% if paused %} · ⏸ PAUSED{% endif %}</td></tr>
+    <tr><th>AI</th><td>{{ S.llm_provider }} ({{ S.gemini_model if S.llm_provider == "gemini" else "" }}) → backup {{ S.llm_fallback }}</td></tr>
+    <tr><th>Approvals</th><td>{{ S.notify }} · mode {{ S.approval_mode }}</td></tr>
+    <tr><th>Reel voice</th><td>{{ S.reel_voice }}</td></tr>
+    <tr><th>Instagram limit</th><td>{{ quota[0] if quota[0] is not none else "–" }} / {{ quota[1] or "–" }} posts (24 ghante)</td></tr>
+  </tbody></table>
+  {% if failed %}<h3 style="margin-top:16px">Pichle 7 din ki fail posts</h3>
+  <table><tbody>{% for p in failed %}<tr><td>{{ p.date }} {{ p.slot }}</td><td>{{ p.topic }}</td><td>{{ badge(p.status) }}</td>
+  <td class="err">{{ (p.error or "")[:160] }}</td></tr>{% endfor %}</tbody></table>{% endif %}
+  <details style="margin-top:14px"><summary>Aakhri warnings / errors (bot.log)</summary>
+  <pre class="log">{% for l in log_lines %}{{ l }}
+{% else %}Koi warning nahi.{% endfor %}</pre></details>
+</section>
+</div>
+
+<script>
+function copyLink(url, btn){
+  navigator.clipboard.writeText(url).then(() => { const t = btn.textContent; btn.textContent = "✔ Copied"; setTimeout(() => btn.textContent = t, 1500); });
+}
+function nativeShare(url, text){ navigator.share({url, text}).catch(() => {}); }
+if (navigator.share) document.querySelectorAll(".native-share").forEach(b => b.hidden = false);
+// refresh every 60 s, but not while a video plays or a confirm box is open
+setInterval(() => { if (![...document.querySelectorAll("video")].some(v => !v.paused)) location.reload(); }, 60000);
+</script>
+</body>
+</html>

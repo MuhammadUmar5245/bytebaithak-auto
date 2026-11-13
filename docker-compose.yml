@@ -1,0 +1,28 @@
+services:
+  worker:
+    build: .
+    image: bytebaithak-worker:latest
+    container_name: bytebaithak-worker
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:8787:8080"   # dashboard: http://localhost:8787 (sirf isi PC par)
+    environment:
+      - TZ=Asia/Karachi
+    volumes:
+      - ./data:/app/data        # calendar.csv, posts.db (database), token
+      - ./output:/app/output    # har post ki slides, caption aur check report
+    command: ["python", "-m", "app.main", "run"]
+
+  # Optional: apne PC par free local AI model (LLM_PROVIDER=ollama).
+  # Start: docker compose --profile local-llm up -d
+  ollama:
+    image: ollama/ollama:0.5.7
+    container_name: bytebaithak-ollama
+    restart: unless-stopped
+    profiles: ["local-llm"]
+    volumes:
+      - ollama:/root/.ollama
+
+volumes:
+  ollama:

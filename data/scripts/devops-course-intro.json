@@ -1,0 +1,42 @@
+{
+  "topic": "Complete DevOps course: the roadmap",
+  "hook": {
+    "kicker": "NEW SERIES",
+    "title": "The complete **DevOps** course",
+    "say": "Want to learn DevOps from zero? Starting today, we are covering a complete DevOps course, right here, step by step."
+  },
+  "scenes": [
+    {
+      "title": "Foundations first",
+      "text": "Linux · Networking · Git · Bash and Python scripting",
+      "code": "",
+      "say": "We start with the foundations: Linux, networking, Git, and scripting with Bash and Python."
+    },
+    {
+      "title": "Build and ship",
+      "text": "Docker · CI/CD pipelines · Kubernetes",
+      "code": "",
+      "say": "Then we build and ship software with Docker, C I C D pipelines, and Kubernetes."
+    },
+    {
+      "title": "Run it in the cloud",
+      "text": "Terraform · Ansible · AWS and Azure · Monitoring · DevSecOps",
+      "code": "",
+      "say": "Next comes infrastructure as code with Terraform and Ansible, the AWS and Azure clouds, monitoring, and security. And we finish with real projects."
+    },
+    {
+      "title": "DevOps is just the start",
+      "text": "Complete courses on **AI**, Machine Learning, Coding and Cloud Computing are coming next.",
+      "code": "",
+      "say": "And DevOps is just the beginning. We will share complete courses on AI, machine learning, coding and cloud computing too."
+    }
+  ],
+  "outro": {
+    "title": "Learn with us",
+    "say": "Follow, so you don't miss a single lesson. And save this roadmap."
+  },
+  "caption": "New series: a complete DevOps course, step by step, right here.\n\nThe roadmap:\n1. Linux and the command line\n2. Networking for DevOps\n3. Git and GitHub\n4. Bash and Python scripting\n5. Docker and containers\n6. CI/CD pipelines\n7. Kubernetes\n8. Infrastructure as Code: Terraform and Ansible\n9. Cloud: AWS and Azure\n10. Monitoring and logging\n11. DevSecOps basics\n12. Real projects for your CV\n\nAfter DevOps, we will share complete courses on AI, Machine Learning, Coding and Cloud Computing.\n\nWhich module are you most excited about?",
+  "hashtags": ["#devops", "#learndevops", "#devopscourse", "#cloudcomputing", "#kubernetes", "#docker"],
+  "sources": [],
+  "claims_to_verify": []
+}

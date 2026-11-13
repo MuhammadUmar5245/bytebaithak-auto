@@ -1,0 +1,44 @@
+date,slot,pillar,format,topic
+2026-11-13,13:00,super_ai,carousel,"Narrow AI vs AGI vs Super AI"
+2026-11-13,15:30,ml,carousel,"Roadmap: zero to AI engineer"
+2026-11-13,11:00,devops,reel,SCRIPT:devops-course-intro
+2026-11-13,12:00,cloud,carousel,SCRIPT:intro
+2026-11-14,13:00,code,carousel,"10 Linux commands every developer needs"
+2026-11-14,15:30,cloud,carousel,"Network engineer to cloud engineer: the roadmap"
+2026-11-14,11:00,ml,reel,"How ChatGPT guesses the next word"
+2026-11-15,13:00,cloud,carousel,"IaaS vs PaaS vs SaaS"
+2026-11-15,15:30,ai_news,carousel,AUTO_NEWS
+2026-11-15,11:00,devops,reel,"Kubernetes in 30 seconds"
+2026-11-16,11:00,devops,reel,"What is DevOps? Explained in 30 seconds"
+2026-11-16,13:00,devops,carousel,"DevOps Course L1: What is DevOps and why companies need it"
+2026-11-16,15:30,ai_news,carousel,AUTO_NEWS
+2026-11-17,11:00,ml,reel,"FACE REEL: why a network engineer is learning AI"
+2026-11-17,13:00,devops,carousel,"DevOps Course L2: Linux basics, the filesystem and moving around"
+2026-11-17,15:30,ml,carousel,"Machine Learning vs Deep Learning vs Generative AI"
+2026-11-18,11:00,devops,reel,"5 Linux commands every DevOps engineer uses daily"
+2026-11-18,13:00,devops,carousel,"DevOps Course L3: Linux users, groups and file permissions"
+2026-11-18,15:30,ai_news,carousel,AUTO_NEWS
+2026-11-19,11:00,code,reel,"Bad prompt vs good prompt"
+2026-11-19,13:00,devops,carousel,"DevOps Course L4: Linux processes, services and logs"
+2026-11-19,15:30,ml,carousel,"What are AI agents?"
+2026-11-20,11:00,devops,reel,"What happens when you open a website? DNS in 30 seconds"
+2026-11-20,13:00,devops,carousel,"DevOps Course L5: Networking for DevOps: IP addresses, ports, DNS and HTTP"
+2026-11-20,15:30,ai_news,carousel,AUTO_NEWS
+2026-11-21,11:00,cloud,reel,"FACE REEL: 3 networking concepts every cloud engineer needs"
+2026-11-21,13:00,devops,carousel,"DevOps Course L6: Networking for DevOps: SSH, firewalls and load balancers"
+2026-11-21,15:30,super_ai,carousel,"AI alignment in plain words"
+2026-11-22,11:00,devops,reel,"Git in 30 seconds: add, commit, push"
+2026-11-22,13:00,devops,carousel,"DevOps Course L7: Git basics: commit, branch, merge"
+2026-11-22,15:30,ai_news,carousel,AUTO_NEWS
+2026-11-23,11:00,devops,reel,"Git branches explained in 30 seconds"
+2026-11-23,13:00,devops,carousel,"DevOps Course L8: GitHub workflow: pull requests and code review"
+2026-11-23,15:30,ml,carousel,"RAG explained simply"
+2026-11-24,11:00,ml,reel,"Run an AI model on your own laptop"
+2026-11-24,13:00,devops,carousel,"DevOps Course L9: Bash scripting basics: variables, if and loops"
+2026-11-24,15:30,ai_news,carousel,AUTO_NEWS
+2026-11-25,11:00,devops,reel,"Your first Bash script in 30 seconds"
+2026-11-25,13:00,devops,carousel,"DevOps Course L10: Python for DevOps automation"
+2026-11-25,15:30,cloud,carousel,"AWS vs Azure vs GCP for beginners"
+2026-11-26,11:00,ml,reel,"FACE REEL: free 90-day AI + Cloud roadmap (comment ROADMAP)"
+2026-11-26,13:00,devops,carousel,"DevOps Course L11: Docker basics: images and containers"
+2026-11-26,15:30,ai_news,carousel,AUTO_NEWS

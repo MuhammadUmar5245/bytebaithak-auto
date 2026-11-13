@@ -1,0 +1,61 @@
+{
+  "topic": "Welcome to ByteBaithak: what this account is about",
+  "cover": {
+    "kicker": "WELCOME",
+    "title": "Welcome to **ByteBaithak**",
+    "subtitle": "Learn AI, DevOps, Cloud and coding, one byte at a time."
+  },
+  "slides": [
+    {
+      "type": "point",
+      "title": "Why the name ByteBaithak?",
+      "body": "A baithak is where people sit together and learn from each other. ByteBaithak is that sitting for tech: short, clear lessons in plain words, one byte at a time.",
+      "bullets": [],
+      "code": ""
+    },
+    {
+      "type": "point",
+      "title": "Who is behind it",
+      "body": "A senior network engineer and **Cisco Networking Academy** instructor from Pakistan, teaching the skills the industry actually uses.",
+      "bullets": [],
+      "code": ""
+    },
+    {
+      "type": "point",
+      "title": "What you will learn here",
+      "body": "",
+      "bullets": ["AI and Machine Learning", "DevOps and Cloud Computing", "Coding and Linux", "AI news, explained simply"],
+      "code": ""
+    },
+    {
+      "type": "point",
+      "title": "Complete courses, step by step",
+      "body": "Not random tips. We are starting with a **complete DevOps course**, and complete courses on AI, Machine Learning, coding and cloud come next.",
+      "bullets": [],
+      "code": ""
+    },
+    {
+      "type": "point",
+      "title": "Who this is for",
+      "body": "",
+      "bullets": ["Students starting out in tech", "Junior developers", "Network and IT engineers moving to cloud"],
+      "code": ""
+    },
+    {
+      "type": "point",
+      "title": "How we teach",
+      "body": "",
+      "bullets": ["Carousels you can save and revise", "Short reels for quick ideas", "AI news with the source linked", "Real commands you can try"],
+      "code": ""
+    }
+  ],
+  "cta": {
+    "title": "Start learning with us",
+    "subtitle": "Follow, save this post, and share it with a friend who is learning tech."
+  },
+  "caption": "Welcome to ByteBaithak.\n\nA baithak is where people sit together and learn. This account is that baithak for tech.\n\nIt is run by a senior network engineer and Cisco Networking Academy instructor from Pakistan.\n\nHere you will learn:\n- AI and Machine Learning\n- DevOps and Cloud Computing\n- Coding and Linux\n- AI news, explained simply\n\nWe are starting with a complete DevOps course, step by step. Complete courses on AI, Machine Learning, coding and cloud computing come next.\n\nWhether you are a student, a junior developer or a network engineer moving to cloud, you are in the right place.\n\nWhat do you want to learn first?",
+  "hashtags": ["#bytebaithak", "#learntech", "#devops", "#artificialintelligence", "#cloudcomputing", "#pakistan"],
+  "alt_text": "An eight-slide welcome carousel for ByteBaithak explaining the name, who runs the account, the topics covered, the upcoming complete courses, who it is for and how the lessons are shared.",
+  "sources": [],
+  "claims_to_verify": []
+}

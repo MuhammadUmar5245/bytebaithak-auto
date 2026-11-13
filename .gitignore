@@ -1,0 +1,16 @@
+# Secrets: never commit
+.env
+.env.*
+!.env.example
+data/ig_token.json
+
+# Runtime data (lives only on this PC)
+data/posts.db
+data/posts.db-*
+data/bot.log
+output/
+models/
+
+# Python
+__pycache__/
+*.pyc

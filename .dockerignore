@@ -1,0 +1,7 @@
+output/
+data/posts.db
+data/bot.log
+data/ig_token.json
+.env
+tests/__pycache__/
+**/__pycache__/
