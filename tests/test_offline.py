@@ -51,6 +51,22 @@ def test_news_picker():
     assert research.pick_top(items)["link"] == "https://a"
     assert research.pick_top(items, avoid_titles=["OpenAI releases a new open model for coding"])["link"] != "https://a"
     assert research._strip("<p>Hi <script>x()</script><b>there</b></p>") == "Hi there"
+
+    # cyber: ranked by security keywords; an unsuitable story is skipped and reported, the next one is used
+    cyber = [
+        {"source": "SecurityWeek", "weight": 2, "title": "State hackers blamed for attack on ministry", "link": "https://e", "summary": "", "when": None},
+        {"source": "BleepingComputer", "weight": 2, "title": "Critical Docker flaw: patch now to fix leaked cloud keys", "link": "https://f", "summary": "", "when": None},
+    ]
+    assert research.rank(cyber, kind="cyber_news")[0]["link"] == "https://f"
+    saved = research.recent_items, research.fetch_text
+    research.recent_items = lambda hours=36, kind="ai_news": copy.deepcopy(cyber)
+    research.fetch_text = lambda url, limit=8000: "Long enough article text. " * 30
+    try:
+        s = research.top_story(kind="cyber_news", accept=lambda st: ("Docker" not in st["title"], "test reason"))
+    finally:
+        research.recent_items, research.fetch_text = saved
+    assert s["link"] == "https://e" and "test reason" in s["rejected"][0], s
+    assert checker.news_suitable({"title": "x", "text": "y"}, "cyber_news")[0] is True  # mock says suitable
     print("news picker: ok")
 
 
@@ -81,9 +97,41 @@ def test_reel():
     print(f"reel: ok ({vid['seconds']}s, {vid['mb']} MB)")
 
 
+def test_weekly_report():
+    """Report with fake metrics; the real database and chat are never touched."""
+    from types import SimpleNamespace
+    from app import pipeline
+    from app.config import S
+    metrics = [{"post_id": f"p{i}", "hours": 72, "topic": f"Topic {i}", "pillar": "devops", "date": "2026-11-10",
+                "data": {"reach": 1000, "saved": i * 3, "shares": i}} for i in range(1, 6)]
+    sent, kv = [], {}
+    db = pipeline.db
+    saved = (db.metrics_since, db.get, db.query, db.kv_set, db.kv_get, pipeline.approval.send, pipeline.S)
+    with tempfile.TemporaryDirectory() as d:
+        db.metrics_since = lambda days=7: copy.deepcopy(metrics)
+        db.get = lambda pid: {"content": {"format": "reel", "hook": {"title": f"Hook **{pid}**"}}}
+        db.query = lambda *a, **k: [{"topic": "Topic 1"}]
+        db.kv_set, db.kv_get = kv.__setitem__, lambda k, default=None: kv.get(k, default)
+        pipeline.approval.send = sent.append
+        pipeline.S = SimpleNamespace(data_dir=S.data_dir, output_dir=__import__("pathlib").Path(d))
+        try:
+            text = "\n".join(pipeline.weekly_report())
+            files = list((pipeline.S.output_dir / "reports").glob("weekly-*.md"))
+            from app import writer
+            hint = "\n".join(writer.learned())
+        finally:
+            (db.metrics_since, db.get, db.query, db.kv_set, db.kv_get, pipeline.approval.send, pipeline.S) = saved
+    assert "Topic 5" in text.split("Kamzor")[0] and "experiments" in text and "missing topics" in text, text
+    assert sent and all(len(m) <= 2000 for m in sent) and len(files) == 1
+    assert "command on screen" in hint, hint  # the report's findings reach the writer
+    assert pipeline._chunks(["x" * 1500, "y" * 1500, "z"]) == ["x" * 1500, "y" * 1500 + "\nz"]
+    print("weekly report: ok")
+
+
 if __name__ == "__main__":
     test_rules_catch_problems()
     test_render_shrinks_and_flags_overflow()
     test_news_picker()
     test_reel()
+    test_weekly_report()
     print("ALL OFFLINE TESTS PASSED")

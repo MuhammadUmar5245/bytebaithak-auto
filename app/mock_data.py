@@ -81,6 +81,15 @@ def reply(system, user, images):
         return {"verdict": "pass", "issues": []}
     if "TASK: WRITE_REEL" in user or "TASK: REVISE_REEL" in user:
         return dict(REEL)
+    if "TASK: NEWS_SUITABILITY" in user:
+        return {"suitable": True, "reason": "mock: concrete facts and a clear lesson"}
+    if "TASK: WEEKLY_REVIEW" in user:
+        return {"patterns": ["Reels with a command on screen got the most saves (12.0 vs 3.1 per 1,000 reach)."],
+                "experiments": [{"change": "Put the command in the hook", "keep": "Topic and length",
+                                 "metric": "saves per 1,000 reach", "posts": "4 reels"}],
+                "ideas": [{"pillar": "devops", "format": "reel", "topic": "5 kubectl commands for debugging"}],
+                "missing_topics": [{"pillar": "cloud", "topic": "How to explain a home lab in an interview",
+                                    "why": "Freshers have no job experience to talk about"}]}
     post = dict(CLOUD)
     for line in user.splitlines():
         if line.startswith("Topic: ") and "AUTO_NEWS" not in line:

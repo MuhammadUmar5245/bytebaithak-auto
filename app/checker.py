@@ -9,6 +9,7 @@ import difflib
 import json
 import re
 
+from .config import NEWS_PILLARS
 from .llm import LLMError, ask_json, can_see_images
 
 HYPE = ("insane", "game-changer", "game changer", "mind-blowing", "mind blowing", "revolutionary",
@@ -79,8 +80,10 @@ def reel_rules(post, recent_topics=()):
         lines = (s.get("code") or "").splitlines()
         if len(lines) > 5:
             err.append(f"scene {i}: code over 5 lines")
-        if any(len(l) > 32 for l in lines):
-            err.append(f"scene {i}: a code line is over 32 characters")
+        # 38 still fits the reel's code box (the template shrinks the font to ~80%); real overflow is
+        # caught by the render step anyway. kubectl/docker commands need the room.
+        if any(len(l) > 38 for l in lines):
+            err.append(f"scene {i}: a code line is over 38 characters; break it with a trailing backslash")
     spoken = [hook.get("say")] + [s.get("say") for s in scenes] + [(post.get("outro") or {}).get("say")]
     total = sum(_words(x) for x in spoken)
     if not 45 <= total <= 140:
@@ -110,13 +113,48 @@ def _common(post, recent_topics, err, warn, min_caption_words):
     srcs = post.get("sources") or []
     if any(not str(u).startswith("https://") for u in srcs):
         err.append("every source must be an https link")
-    if post.get("pillar") == "ai_news" and not srcs:
-        err.append("AI news post without a source link")
+    if post.get("pillar") in NEWS_PILLARS and not srcs:
+        err.append("news post without a source link")
     topic = (post.get("topic") or "").lower()
     for t in recent_topics:
         if t and difflib.SequenceMatcher(None, topic, t.lower()).ratio() > 0.86:
             warn.append(f"very similar to an earlier post: '{t}'")
             break
+
+
+SUITABILITY_SYSTEM = """You decide if a news story fits an educational Instagram account for students, junior
+developers and IT/network engineers in Pakistan and India who want cloud, DevOps, AI or security jobs.
+The account is calm, practical and non-political. Judge only from the story text given.
+
+SUITABLE when both are true:
+- it is about software, systems or tools this audience uses or will use at work (operating systems, cloud,
+  DevOps tools, developer packages, browsers, phones, networks, AI tools) or it is a large, confirmed incident;
+- the source states concrete facts, and a viewer can learn a clear lesson or action from it (for security:
+  patch or update, check a setting, rotate leaked keys, spot a phishing sign, use MFA).
+
+NOT SUITABLE when any is true:
+- the main point is blaming a country, government or army, or it is about a political or military conflict
+  (including India-Pakistan); or it is hacktivist claims that are not confirmed;
+- it is built on rumours, anonymous unverified claims, or the facts are still unclear;
+- it centres on naming, exposing or accusing a private person;
+- it would point viewers to leaked personal data, or is mostly about how to carry out an attack;
+- it is a narrow vendor advisory (e.g. industrial control systems) that almost none of this audience touches;
+- it is gossip, stock prices, lawsuits or business deals with nothing to learn;
+- it is a sponsored post or product advertisement.
+
+Return JSON: {"suitable": true or false, "reason": "max 15 words"}"""
+
+
+def news_suitable(story, pillar):
+    """(ok, reason) for an AUTO_NEWS story. If the check itself fails, the story is allowed: the fact check
+    and the owner's approval still come after it."""
+    user = ["TASK: NEWS_SUITABILITY", f"Pillar: {pillar}", f"Source: {story.get('source')}",
+            f"Title: {story.get('title')}", f"Text: {(story.get('text') or '')[:4000]}"]
+    try:
+        r = ask_json(SUITABILITY_SYSTEM, "\n".join(user))
+    except LLMError as e:
+        return True, f"suitability check could not run: {e}"
+    return r.get("suitable") is True, str(r.get("reason") or "")[:200]
 
 
 FACT_SYSTEM = """You are a strict technical editor and fact checker for an educational Instagram account.

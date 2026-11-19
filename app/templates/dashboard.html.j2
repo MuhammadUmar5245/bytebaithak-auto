@@ -89,10 +89,26 @@ details summary{cursor:pointer;color:var(--muted)}
     {% if paused %}<span class="badge s-failed_check">⏸ PAUSED</span>{{ act("resume", "", "▶ Resume posting") }}
     {% else %}{{ act("pause", "", "⏸ Pause posting") }}{% endif %}
     <span class="badge s-scheduled">Approval: {{ S.approval_mode }}</span>
+    {% if password_on %}<a class="btn" href="/logout">🚪 Logout</a>{% endif %}
   </div>
 </header>
 
 {% if msg %}<div class="flash">{{ msg }}</div>{% endif %}
+
+<div class="panel" style="padding:14px 20px">
+  <div class="row">
+    <b>🌐 Phone / internet link:</b>
+    {% if public_url and password_on %}
+      <a href="{{ public_url }}" target="_blank" rel="noopener">{{ public_url }}</a>
+      <button class="btn" type="button" onclick='copyLink({{ public_url | tojson }}, this)'>📋 Copy</button>
+      <span class="muted small">login zaroori · link har restart par badalta hai (Discord par naya aata hai)</span>
+    {% elif not password_on %}
+      <span class="muted small">Band hai. <code>.env</code> mein <code>DASHBOARD_PASSWORD</code> (10+ harf) set karein, phir restart.</span>
+    {% else %}
+      <span class="muted small">Tunnel abhi tayyar ho raha hai, 1-2 minute baad page refresh karein.</span>
+    {% endif %}
+  </div>
+</div>
 
 <div class="grid tiles" style="margin-bottom:20px">
   <div class="tile"><div class="n">{{ "{:,}".format(account.followers_count) if account.followers_count is number else "–" }}</div><div class="l">Followers</div></div>

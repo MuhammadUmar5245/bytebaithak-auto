@@ -109,6 +109,45 @@ window.fitAll = () => {
   });
   return report;
 };
+
+// Motion. seek(i, t) puts scene i in the state it has t seconds after it starts, so Python can
+// screenshot any moment frame by frame (no real-time playback, so no dropped or uneven frames).
+// Elements rise in one after another, code lines appear one by one, the progress bar slides forward.
+// After introLength(i) seconds the scene looks exactly like its still frame (slide-NN.jpg).
+const STEP = 0.14, DUR = 0.5, LINE = 0.28, BAR = 0.6;
+const clamp = x => Math.min(Math.max(x, 0), 1);
+const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+const sceneParts = i => {
+  const scene = document.getElementById('s' + i);
+  if (!scene._parts) {
+    scene.querySelectorAll('.code pre').forEach(pre => {
+      pre.innerHTML = pre.innerHTML.split('\n').map(l => `<span class="ln">${l}</span>`).join('\n');
+    });
+    const items = [...scene.querySelectorAll('.kicker, .main > *')];
+    const code = scene.querySelector('.main > .code');
+    const bar = scene.querySelector('.progress span');
+    scene._parts = {items, bar, end: parseFloat(bar.style.width) || 0,
+      lines: [...scene.querySelectorAll('.code .ln')],
+      codeAt: code ? items.indexOf(code) * STEP + DUR * 0.6 : 0};
+  }
+  return scene._parts;
+};
+window.introLength = i => {
+  const p = sceneParts(i);
+  return Math.max(p.items.length * STEP + DUR, BAR, p.lines.length ? p.codeAt + p.lines.length * LINE + 0.2 : 0);
+};
+window.seek = (i, t) => {
+  const p = sceneParts(i);
+  p.items.forEach((el, j) => {
+    const k = ease((t - j * STEP) / DUR);
+    el.style.opacity = k;
+    if (el.classList.contains('idx')) { el.style.transformOrigin = 'left center'; el.style.transform = `scale(${0.5 + 0.5 * k})`; }
+    else el.style.transform = `translateY(${(1 - k) * 70}px)`;
+  });
+  p.lines.forEach((ln, j) => { ln.style.opacity = clamp((t - p.codeAt - j * LINE) / 0.12); });
+  const start = i > 1 ? 100 * (i - 1) / {{ total }} : 0;
+  p.bar.style.width = (start + (p.end - start) * ease(t / BAR)) + '%';
+};
 </script>
 </body>
 </html>

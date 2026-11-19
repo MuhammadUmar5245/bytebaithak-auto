@@ -23,8 +23,8 @@ date,slot,pillar,format,topic
 2026-11-19,15:30,ml,carousel,"What are AI agents?"
 2026-11-20,11:00,devops,reel,"What happens when you open a website? DNS in 30 seconds"
 2026-11-20,13:00,devops,carousel,"DevOps Course L5: Networking for DevOps: IP addresses, ports, DNS and HTTP"
-2026-11-20,15:30,ai_news,carousel,AUTO_NEWS
-2026-11-21,11:00,cloud,reel,"FACE REEL: 3 networking concepts every cloud engineer needs"
+2026-11-20,15:30,cyber_news,carousel,AUTO_NEWS
+2026-11-21,11:00,cloud,reel,"3 networking concepts every cloud engineer needs"
 2026-11-21,13:00,devops,carousel,"DevOps Course L6: Networking for DevOps: SSH, firewalls and load balancers"
 2026-11-21,15:30,super_ai,carousel,"AI alignment in plain words"
 2026-11-22,11:00,devops,reel,"Git in 30 seconds: add, commit, push"
@@ -35,10 +35,100 @@ date,slot,pillar,format,topic
 2026-11-23,15:30,ml,carousel,"RAG explained simply"
 2026-11-24,11:00,ml,reel,"Run an AI model on your own laptop"
 2026-11-24,13:00,devops,carousel,"DevOps Course L9: Bash scripting basics: variables, if and loops"
-2026-11-24,15:30,ai_news,carousel,AUTO_NEWS
+2026-11-24,15:30,cyber_news,carousel,AUTO_NEWS
 2026-11-25,11:00,devops,reel,"Your first Bash script in 30 seconds"
 2026-11-25,13:00,devops,carousel,"DevOps Course L10: Python for DevOps automation"
 2026-11-25,15:30,cloud,carousel,"AWS vs Azure vs GCP for beginners"
-2026-11-26,11:00,ml,reel,"FACE REEL: free 90-day AI + Cloud roadmap (comment ROADMAP)"
+2026-11-26,11:00,ml,reel,"Free 90-day AI + Cloud roadmap (comment ROADMAP)"
 2026-11-26,13:00,devops,carousel,"DevOps Course L11: Docker basics: images and containers"
 2026-11-26,15:30,ai_news,carousel,AUTO_NEWS
+2026-11-27,11:00,devops,reel,"Kubernetes 1/30: What is Kubernetes and why does it exist?"
+2026-11-27,13:00,devops,carousel,"DevOps Course L12: Dockerfile: build your own image"
+2026-11-27,15:30,cyber_news,carousel,AUTO_NEWS
+2026-11-28,11:00,devops,reel,"Kubernetes 2/30: Container vs Pod: what is the difference?"
+2026-11-28,13:00,devops,carousel,"DevOps Course L13: Docker volumes and networks"
+2026-11-28,15:30,devops,carousel,"Your first DevOps portfolio project: what to build"
+2026-11-29,11:00,devops,reel,"Kubernetes 3/30: What is a Pod?"
+2026-11-29,13:00,devops,carousel,"DevOps Course L14: Docker Compose: run multi-container apps"
+2026-11-29,15:30,ai_news,carousel,AUTO_NEWS
+2026-11-30,11:00,devops,reel,"Kubernetes 4/30: Cluster, control plane and worker nodes"
+2026-11-30,13:00,devops,carousel,"DevOps Course L15: Container registries: pushing images to Docker Hub"
+2026-11-30,15:30,devops,carousel,"Tech resume with no job experience: what to write"
+2026-12-01,11:00,devops,reel,"Kubernetes 5/30: kubectl: your remote control for the cluster"
+2026-12-01,13:00,devops,carousel,"DevOps Course L16: CI/CD explained: from commit to production"
+2026-12-01,15:30,cyber_news,carousel,AUTO_NEWS
+2026-12-02,11:00,devops,reel,"Kubernetes 6/30: Deployments: keep your app always running"
+2026-12-02,13:00,devops,carousel,"DevOps Course L17: GitHub Actions: your first pipeline"
+2026-12-02,15:30,ml,carousel,"Run AI models on a low-RAM laptop"
+2026-12-03,11:00,devops,reel,"Kubernetes 7/30: ReplicaSets and self-healing"
+2026-12-03,13:00,devops,carousel,"DevOps Course L18: Testing and building in a CI pipeline"
+2026-12-03,15:30,ai_news,carousel,AUTO_NEWS
+2026-12-04,11:00,devops,reel,"Kubernetes 8/30: Rolling updates and rollbacks"
+2026-12-04,13:00,devops,carousel,"DevOps Course L19: Infrastructure as Code: why and how"
+2026-12-04,15:30,devops,carousel,"Mock junior DevOps interview: questions and answers"
+2026-12-05,11:00,devops,reel,"Kubernetes 9/30: Services: a stable address for your pods"
+2026-12-05,13:00,devops,carousel,"DevOps Course L20: Terraform basics: providers, resources, plan and apply"
+2026-12-05,15:30,cyber_news,carousel,AUTO_NEWS
+2026-12-06,11:00,devops,reel,"Kubernetes 10/30: ClusterIP vs NodePort vs LoadBalancer"
+2026-12-06,13:00,devops,carousel,"DevOps Course L21: Terraform state and variables"
+2026-12-06,15:30,cloud,carousel,"AWS free tier: practise without surprise charges"
+2026-12-07,11:00,devops,reel,"Kubernetes 11/30: Ingress: one door for many apps"
+2026-12-07,13:00,devops,carousel,"DevOps Course L22: Ansible basics: configure many servers at once"
+2026-12-07,15:30,ai_news,carousel,AUTO_NEWS
+2026-12-08,11:00,devops,reel,"Kubernetes 12/30: Namespaces: split one cluster into rooms"
+2026-12-08,13:00,devops,carousel,"DevOps Course L23: Cloud fundamentals: regions, zones and core services"
+2026-12-08,15:30,cloud,carousel,"CCNA vs AWS: which certification first?"
+2026-12-09,11:00,devops,reel,"Kubernetes 13/30: Labels and selectors"
+2026-12-09,13:00,devops,carousel,"DevOps Course L24: AWS IAM: users, roles and least privilege"
+2026-12-09,15:30,cyber_news,carousel,AUTO_NEWS
+2026-12-10,11:00,devops,reel,"Kubernetes 14/30: ConfigMaps: settings outside the image"
+2026-12-10,13:00,devops,carousel,"DevOps Course L25: AWS EC2 and security groups"
+2026-12-10,15:30,code,carousel,"English tips for IT interviews"
+2026-12-11,11:00,devops,reel,"Kubernetes 15/30: Secrets, and why base64 is not encryption"
+2026-12-11,13:00,devops,carousel,"DevOps Course L26: AWS VPC: subnets, route tables and gateways"
+2026-12-11,15:30,ai_news,carousel,AUTO_NEWS
+2026-12-12,11:00,devops,reel,"Kubernetes 16/30: Volumes and PersistentVolumeClaims"
+2026-12-12,13:00,devops,carousel,"DevOps Course L27: AWS S3: buckets, storage classes and permissions"
+2026-12-12,15:30,devops,carousel,"CKA certification roadmap for beginners"
+2026-12-13,11:00,devops,reel,"Kubernetes 17/30: StatefulSets: running databases"
+2026-12-13,13:00,devops,carousel,"DevOps Course L28: Kubernetes architecture for DevOps engineers"
+2026-12-13,15:30,cyber_news,carousel,AUTO_NEWS
+2026-12-14,11:00,devops,reel,"Kubernetes 18/30: DaemonSets: one pod on every node"
+2026-12-14,13:00,devops,carousel,"DevOps Course L29: Deploying an app to Kubernetes with YAML"
+2026-12-14,15:30,cloud,carousel,"Linux troubleshooting: common production issues"
+2026-12-15,11:00,devops,reel,"Kubernetes 19/30: Jobs and CronJobs"
+2026-12-15,13:00,devops,carousel,"DevOps Course L30: Kubernetes Services and Ingress in practice"
+2026-12-15,15:30,ai_news,carousel,AUTO_NEWS
+2026-12-16,11:00,devops,reel,"Kubernetes 20/30: Liveness and readiness probes"
+2026-12-16,13:00,devops,carousel,"DevOps Course L31: Helm charts in practice"
+2026-12-16,15:30,devops,carousel,"Helpdesk to cloud and DevOps: the transition plan"
+2026-12-17,11:00,devops,reel,"Kubernetes 21/30: Resource requests and limits"
+2026-12-17,13:00,devops,carousel,"DevOps Course L32: Monitoring basics: metrics, logs and alerts"
+2026-12-17,15:30,cyber_news,carousel,AUTO_NEWS
+2026-12-18,11:00,devops,reel,"Kubernetes 22/30: Horizontal Pod Autoscaler (HPA)"
+2026-12-18,13:00,devops,carousel,"DevOps Course L33: Prometheus and Grafana basics"
+2026-12-18,15:30,code,carousel,"Git merge conflicts: how to resolve them"
+2026-12-19,11:00,devops,reel,"Kubernetes 23/30: How pods talk to each other: Kubernetes networking"
+2026-12-19,13:00,devops,carousel,"DevOps Course L34: Centralised logging basics"
+2026-12-19,15:30,ai_news,carousel,AUTO_NEWS
+2026-12-20,11:00,devops,reel,"Kubernetes 24/30: RBAC: who can do what in the cluster"
+2026-12-20,13:00,devops,carousel,"DevOps Course L35: DevSecOps basics: secrets and image scanning"
+2026-12-20,15:30,cloud,carousel,"AWS Solutions Architect Associate: study roadmap"
+2026-12-21,11:00,devops,reel,"Kubernetes 25/30: Helm: the package manager for Kubernetes"
+2026-12-21,13:00,devops,carousel,"DevOps Course L36: GitOps with Argo CD"
+2026-12-21,15:30,cyber_news,carousel,AUTO_NEWS
+2026-12-22,11:00,devops,reel,"Kubernetes 26/30: Debugging a CrashLoopBackOff pod"
+2026-12-22,13:00,devops,carousel,"DevOps Course L37: Deployment strategies: blue-green and canary"
+2026-12-22,15:30,code,carousel,"Python script to back up files to AWS S3"
+2026-12-23,11:00,devops,reel,"Kubernetes 27/30: Run Kubernetes on your laptop: kind and minikube"
+2026-12-23,13:00,devops,carousel,"DevOps Course L38: Incident response and on-call basics"
+2026-12-23,15:30,ai_news,carousel,AUTO_NEWS
+2026-12-24,11:00,devops,reel,"Kubernetes 28/30: Managed Kubernetes: EKS vs AKS vs GKE"
+2026-12-24,13:00,devops,carousel,"DevOps Course L39: Final project part 1: plan a full DevOps pipeline"
+2026-12-24,15:30,ml,carousel,"Fine-tuning vs prompting: when to use which"
+2026-12-25,11:00,devops,reel,"Kubernetes 29/30: 5 Kubernetes interview questions"
+2026-12-25,13:00,devops,carousel,"DevOps Course L40: Final project part 2: build and deploy it"
+2026-12-25,15:30,cyber_news,carousel,AUTO_NEWS
+2026-12-26,11:00,devops,reel,"Kubernetes 30/30: Kubernetes roadmap: what to learn next"
+2026-12-26,13:00,devops,carousel,"DevOps Course L41: DevOps career: resume, portfolio and interviews"
+2026-12-26,15:30,code,carousel,"Free resources to learn coding for cloud automation"

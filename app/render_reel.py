@@ -1,11 +1,14 @@
 """Turns a reel script (JSON) into a 1080x1920 MP4: Playwright frames + Kokoro voiceover + ffmpeg.
 
-Scene 1 = hook, then one frame per scene, then the outro. Each frame stays on screen exactly as long
-as its narration (plus a short pause) and cross-fades into the next one, so picture and voice stay in sync.
+Scene 1 = hook, then one scene per idea, then the outro. Each scene plays a short entrance animation
+(see seek() in reel.html.j2), holds until its narration (plus a short pause) ends, then cuts to the next,
+so picture and voice stay in sync.
 Everything runs offline in the container; no paid service is used.
 """
 import logging
+import math
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -18,7 +21,6 @@ from .render_carousel import _env
 
 log = logging.getLogger("reel")
 FPS = 30
-FADE = 0.3          # seconds of cross-fade between scenes
 LEAD = 0.15         # silence before each line
 TAIL = 0.45         # silence after each line
 _kokoro = None
@@ -93,33 +95,59 @@ def voiceover(lines, out_dir):
     return wav, durations
 
 
+def motion_frames(out_dir, durs):
+    """Screenshot each scene's entrance animation, frame by frame, from the reel.html render_frames wrote.
+    Returns one (folder, frame count) per scene. The intro never runs longer than the scene's narration."""
+    out_dir = Path(out_dir)
+    anim = out_dir / "anim"
+    shutil.rmtree(anim, ignore_errors=True)
+    seqs = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch(args=["--no-sandbox"])
+        page = browser.new_page(viewport={"width": 1080, "height": 1920}, device_scale_factor=1)
+        page.goto((out_dir / "reel.html").resolve().as_uri())
+        page.evaluate("document.fonts.ready")
+        page.evaluate("window.fitAll()")
+        for i, d in enumerate(durs, 1):
+            folder = anim / f"s{i:02d}"
+            folder.mkdir(parents=True)
+            count = max(1, min(math.ceil(page.evaluate(f"window.introLength({i})") * FPS) + 1, int(d * FPS)))
+            scene = page.locator(f"#s{i}")
+            for f in range(count):
+                t = f / FPS if f < count - 1 else 999      # the last frame is always the finished scene
+                page.evaluate(f"window.seek({i}, {t})")
+                scene.screenshot(path=str(folder / f"{f:03d}.jpg"), type="jpeg", quality=90)
+            seqs.append((folder, count))
+        browser.close()
+    return seqs
+
+
 def make_video(post, frames, out_dir):
-    """Frames + narration -> reel.mp4 (H.264 + AAC, 1080x1920, 30 fps, as Instagram wants)."""
+    """Frames + narration -> reel.mp4 (H.264 + AAC, 1080x1920, 30 fps, as Instagram wants).
+    Each scene plays its entrance animation, then holds its last frame until its narration ends;
+    scenes cut straight into each other, so picture and voice stay in sync."""
     out_dir = Path(out_dir)
     lines = narration_lines(post)
     if len(lines) != len(frames):
         raise ValueError(f"{len(frames)} frames but {len(lines)} narration lines")
     wav, durs = voiceover(lines, out_dir)
+    seqs = motion_frames(out_dir, durs)
 
     cmd = ["ffmpeg", "-y", "-loglevel", "error"]
-    n = len(frames)
-    for i, (f, d) in enumerate(zip(frames, durs)):
-        # every clip except the last is FADE longer, because each cross-fade eats FADE seconds
-        cmd += ["-loop", "1", "-framerate", str(FPS), "-t", f"{d + (FADE if i < n - 1 else 0):.3f}", "-i", str(f)]
+    for folder, _ in seqs:
+        cmd += ["-framerate", str(FPS), "-i", str(folder / "%03d.jpg")]
     cmd += ["-i", str(wav)]
-
-    parts = [f"[{i}:v]format=yuv420p,setsar=1,fps={FPS}[f{i}]" for i in range(n)]
-    prev, offset = "f0", 0.0
-    for i in range(1, n):
-        offset += durs[i - 1]        # scene i starts fading in exactly when its narration starts
-        label = f"x{i}"
-        parts.append(f"[{prev}][f{i}]xfade=transition=fade:duration={FADE}:offset={offset:.3f}[{label}]")
-        prev = label
-    cmd += ["-filter_complex", ";".join(parts), "-map", f"[{prev}]", "-map", f"{n}:a",
+    n = len(seqs)
+    parts = [f"[{i}:v]format=yuv420p,setsar=1,"
+             f"tpad=stop_mode=clone:stop_duration={max(d - count / FPS, 0):.3f}[v{i}]"
+             for i, ((_, count), d) in enumerate(zip(seqs, durs))]
+    parts.append("".join(f"[v{i}]" for i in range(n)) + f"concat=n={n}:v=1:a=0[v]")
+    cmd += ["-filter_complex", ";".join(parts), "-map", "[v]", "-map", f"{n}:a",
             "-c:v", "libx264", "-preset", "medium", "-crf", "21", "-profile:v", "high", "-pix_fmt", "yuv420p",
             "-r", str(FPS), "-c:a", "aac", "-b:a", "128k", "-ar", "48000", "-ac", "2",
             "-shortest", "-movflags", "+faststart", str(out_dir / "reel.mp4")]
     res = subprocess.run(cmd, capture_output=True, text=True)
+    shutil.rmtree(out_dir / "anim", ignore_errors=True)
     if res.returncode != 0:
         raise RuntimeError(f"ffmpeg failed: {res.stderr[-600:]}")
     video = out_dir / "reel.mp4"

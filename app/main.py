@@ -89,6 +89,7 @@ def main(argv=None):
     ap.add_argument("--date")
     ap.add_argument("--topic", default="IaaS vs PaaS vs SaaS")
     ap.add_argument("--pillar", default="cloud")
+    ap.add_argument("--format", default="carousel", choices=["carousel", "reel"])
     a = ap.parse_args(argv)
 
     from . import approval, db, pipeline
@@ -96,7 +97,7 @@ def main(argv=None):
         return run()
     if a.cmd == "preview":
         r = pipeline.produce({"date": str(today()), "slot": "00:00", "pillar": a.pillar,
-                              "format": "carousel", "topic": a.topic}, preview=True)
+                              "format": a.format, "topic": a.topic}, preview=True)
         print(r)
         return 0 if r["status"] != "failed_check" else 1
     if a.cmd == "generate":

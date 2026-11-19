@@ -6,7 +6,7 @@ import threading
 from datetime import datetime, timedelta
 
 from . import approval, checker, db, render_reel, research, writer
-from .config import S, SENSITIVE_PILLARS, now as tz_now, today
+from .config import NEWS_PILLARS, S, SENSITIVE_PILLARS, now as tz_now, today
 from .render_carousel import render
 
 log = logging.getLogger("pipeline")
@@ -46,13 +46,16 @@ def produce(row, preview=False):
     try:
         news = None
         if topic == "AUTO_NEWS":
-            recent = [p["topic"] for p in db.query("pillar='ai_news'")][-40:]
-            news = research.top_story(avoid_titles=recent)
+            kind = pillar if pillar in NEWS_PILLARS else "ai_news"
+            recent = [p["topic"] for p in db.query("pillar=?", (kind,))][-40:]
+            news = research.top_story(avoid_titles=recent, kind=kind,
+                                      accept=lambda s: checker.news_suitable(s, kind))
             if not news:
-                return _fail(pid, base, "no fresh AI story with enough source text", preview)
+                return _fail(pid, base, f"no fresh, suitable {kind} story with enough source text", preview)
             topic = news["title"]
             base["topic"] = topic
-            report["news"] = {"source": news["source"], "link": news["link"]}
+            report["news"] = {"source": news["source"], "link": news["link"], "skipped": news["rejected"]}
+            notes += [f"news chhodi · {r}"[:300] for r in news["rejected"][:3]]
 
         recent_topics = [] if preview else db.recent_topics(exclude_id=pid)
         # "SCRIPT:name" = the owner's own words from data/scripts/name.json; the AI never rewrites them
@@ -333,26 +336,106 @@ def collect_insights():
                     log.warning("insights %s failed: %s", p["id"], e)
 
 
-def weekly_report():
-    rows = [m for m in db.metrics_since(8) if m["hours"] == 72]
-    if not rows:
-        return approval.send("📊 Weekly report: abhi koi 72-ghante wala data nahi")
+REVIEW_SYSTEM = f"""You are the content strategist for an educational Instagram account. {writer.ABOUT}
+Pillars: ai_news, cyber_news, super_ai, ml, devops, cloud, code. Formats: carousels and 25-45 second Reels
+(on-screen text, code and an AI voiceover, no face).
+
+You get the account's post results (72 hours after posting), the topics already posted, and the topics
+already planned. Judge success mainly by saves + shares per 1,000 reach, then reach. Only state patterns the
+numbers actually show; with few posts, say the evidence is weak. Do not invent numbers.
+Posting times are fixed before 17:00 Pakistan time (the owner's PC may be off later), so never suggest
+evening or night posting; experiments must change content, hooks, format or length instead.
+Missing topics: what this audience needs on the way to a cloud, DevOps or AI job (hands-on skills,
+interview prep, certifications like CCNA, AWS and CKA, portfolio projects, career moves) that is neither
+posted nor planned. Each topic must fit one carousel or one 30-45 second Reel.
+
+Return ONLY JSON:
+{{"patterns": ["max 5 findings, each naming the numbers behind it"],
+  "experiments": [{{"change": "what to try", "keep": "what stays the same", "metric": "which number decides",
+                    "posts": "how many posts to judge it"}}],
+  "ideas": [{{"pillar": "...", "format": "reel or carousel", "topic": "new topic in the angle of the winners"}}],
+  "missing_topics": [{{"pillar": "...", "topic": "...", "why": "max 15 words"}}]}}
+Give 5 experiments, 10 ideas and 10 missing topics. With no results, return empty patterns, experiments
+and ideas, and still give the missing topics."""
+
+
+def _all_calendar_rows():
+    with open(S.data_dir / "calendar.csv", newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+
+def _scored(rows):
     for m in rows:
         d = m["data"]
         reach = max(d.get("reach") or d.get("views") or 1, 1)
         m["score"] = round(1000 * ((d.get("saved") or 0) + (d.get("shares") or 0)) / reach, 1)
-    rows.sort(key=lambda m: m["score"], reverse=True)
-    fmt = lambda m: f"{m['score']:>5} · {m['pillar']} · {m['topic']}"
-    text = ["📊 Weekly report (saves+shares per 1,000 reach)", "Top:", *map(fmt, rows[:3]),
-            "Kamzor:", *map(fmt, rows[-3:])]
+        content = (db.get(m["post_id"]) or {}).get("content") or {}
+        m["format"] = content.get("format") or "carousel"
+        m["hook"] = ((content.get("hook") or content.get("cover") or {}).get("title") or "").replace("**", "")
+    return sorted(rows, key=lambda m: m["score"], reverse=True)
+
+
+def _chunks(lines, size=1900):
+    """Discord takes 2,000 characters per message, so send long text in pieces."""
+    out, cur = [], ""
+    for line in lines:
+        if cur and len(cur) + len(line) + 1 > size:
+            out.append(cur)
+            cur = ""
+        cur = (cur + "\n" + line) if cur else line[:size]
+    return out + [cur] if cur else out
+
+
+def weekly_report():
+    """Sunday: top/weak posts, what the numbers show, 5 experiments, new ideas and missing topics.
+    Sent to the approvals chat and saved as output/reports/weekly-<date>.md."""
+    week = _scored([m for m in db.metrics_since(8) if m["hours"] == 72])
+    month = _scored([m for m in db.metrics_since(30) if m["hours"] == 72])
+    fmt = lambda m: f"{m['score']:>5} · {m['format']} · {m['pillar']} · {m['topic']}"
+    text = ["📊 **Weekly report** (score = saves+shares per 1,000 reach)"]
+    if week:
+        text += ["**Top:**", *map(fmt, week[:3])]
+        if week[3:]:  # with few posts, don't list the same post as both top and weak
+            text += ["**Kamzor:**", *map(fmt, week[3:][-3:])]
+    else:
+        text.append("Is hafte ka 72-ghante wala data abhi nahi hai.")
+
+    posted = [p["topic"] for p in db.query("status IN ('published','dry_run','approved','pending_approval')")]
+    planned = [r["topic"] for r in _all_calendar_rows() if r.get("date", "") >= str(today())]
+    results = [{"topic": m["topic"], "format": m["format"], "pillar": m["pillar"], "hook": m["hook"],
+                "score": m["score"], **{k: m["data"].get(k) for k in ("reach", "views", "saved", "shares",
+                                                                         "likes", "comments")}} for m in month]
     try:
         from .llm import ask_json
-        ideas = ask_json("You plan Instagram content for an AI + computer science education account. Return JSON "
-                         '{"ideas": [{"pillar": "...", "topic": "..."}]} with 10 ideas similar in angle to the top '
-                         "posts and unlike the weak ones.",
-                         "Top posts: " + "; ".join(m["topic"] for m in rows[:5]) +
-                         "\nWeak posts: " + "; ".join(m["topic"] for m in rows[-3:]))
-        text += ["", "Agle hafte ke ideas:"] + [f"• {i['pillar']}: {i['topic']}" for i in ideas.get("ideas", [])[:10]]
+        r = ask_json(REVIEW_SYSTEM, "\n".join([
+            "TASK: WEEKLY_REVIEW",
+            "Results of the last 30 days: " + (json.dumps(results, ensure_ascii=False) if results else "none yet"),
+            "Already posted: " + "; ".join(posted[-80:]),
+            "Already planned: " + "; ".join(planned[:60])]))
+        if r.get("patterns"):
+            text += ["", "**Numbers kya keh rahe hain:**", *[f"• {x}" for x in r["patterns"][:5]]]
+            if results:  # the writer reads these as hints for every new post (writer.learned)
+                db.kv_set("learnings", json.dumps([str(x) for x in r["patterns"][:5]], ensure_ascii=False))
+        if r.get("experiments"):
+            text += ["", "**Agle 2 hafte ke experiments:**"]
+            text += [f"{i}. {e.get('change')} (same: {e.get('keep')}; dekhna: {e.get('metric')}; {e.get('posts')})"
+                     for i, e in enumerate(r["experiments"][:5], 1) if isinstance(e, dict)]
+        if r.get("ideas"):
+            text += ["", "**Winners jaise naye ideas:**"]
+            text += [f"• {i.get('pillar')} · {i.get('format')}: {i.get('topic')}"
+                     for i in r["ideas"][:10] if isinstance(i, dict)]
+        if r.get("missing_topics"):
+            text += ["", "**Jo audience ko chahiye, abhi cover nahi (missing topics):**"]
+            text += [f"• {i.get('pillar')}: {i.get('topic')} — {i.get('why')}"
+                     for i in r["missing_topics"][:10] if isinstance(i, dict)]
+        text += ["", "Pasand aaye to topic `data/calendar.csv` mein daal dein."]
     except Exception as e:
-        log.warning("ideas failed: %s", e)
-    approval.send("\n".join(text))
+        log.warning("weekly review failed: %s", e)
+        text.append(f"(AI review nahi chal saka: {str(e)[:200]})")
+
+    folder = S.output_dir / "reports"
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / f"weekly-{today()}.md").write_text("\n".join(text), encoding="utf-8")
+    for part in _chunks(text):
+        approval.send(part)
+    return text

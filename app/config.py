@@ -67,6 +67,11 @@ class Settings:
     ig_token: str = os.environ.get("IG_ACCESS_TOKEN", "")
     ig_version: str = os.environ.get("IG_API_VERSION", "").strip()
 
+    # Dashboard login. Without a password (10+ characters) the dashboard only opens on this PC.
+    dashboard_user: str = os.environ.get("DASHBOARD_USER", "admin").strip()
+    dashboard_password: str = os.environ.get("DASHBOARD_PASSWORD", "")
+    tunnel_url: str = os.environ.get("TUNNEL_METRICS", "http://tunnel:2000").rstrip("/")
+
     data_dir: Path = BASE / "data"
     output_dir: Path = BASE / "output"
     assets_dir: Path = BASE / "assets"
@@ -107,9 +112,11 @@ def today():
     return now().date()
 
 # Topics that must always be approved by a human unless APPROVAL_MODE=none
-SENSITIVE_PILLARS = {"ai_news", "super_ai"}
+SENSITIVE_PILLARS = {"ai_news", "cyber_news", "super_ai"}
+NEWS_PILLARS = {"ai_news", "cyber_news"}   # AUTO_NEWS rows; facts only from the fetched article
 PILLARS = {
     "ai_news": ("AI NEWS", "#22D3EE"),
+    "cyber_news": ("CYBER NEWS", "#F43F5E"),
     "super_ai": ("SUPER AI", "#F59E0B"),
     "ml": ("MACHINE LEARNING", "#A78BFA"),
     "devops": ("DEVOPS", "#22C55E"),
