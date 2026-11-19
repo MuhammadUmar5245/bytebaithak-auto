@@ -88,7 +88,7 @@ REEL_SCHEMA = """{
   "hook_options": ["5 different hooks you considered, max 8 words each"],
   "hook": {"kicker": "2-3 words, e.g. DEVOPS IN 30s", "title": "max 7 words, wrap the key word in **double stars**", "say": "spoken opening line, max 20 words, makes the viewer stay"},
   "scenes": [
-    {"title": "max 6 words", "text": "on-screen text, max 16 words", "code": "optional, max 4 lines, max 34 characters per line; break a long command over lines with a trailing backslash", "say": "what the narrator says during this scene, max 32 words"}
+    {"title": "max 6 words", "text": "on-screen text, max 10 words", "code": "optional, max 4 lines, max 34 characters per line; break a long command over lines with a trailing backslash", "say": "what the narrator says during this scene, 8 to 20 words (about 4-6 seconds)"}
   ],
   "outro": {"title": "max 6 words", "say": "spoken closing line, max 16 words, invite viewers to follow and save"},
   "caption": "60-150 words, short lines, plain language, ends with one question to the reader",
@@ -99,7 +99,9 @@ REEL_SCHEMA = """{
 
 REEL_SYSTEM = f"""You write short vertical video scripts (Instagram Reels, 25-45 seconds). {ABOUT}
 
-Structure: a hook scene, then 3 to 5 scenes with one idea each, then an outro. The narration ("say")
+Structure: a hook scene, then 5 to 8 short scenes, then an outro. A new scene every 4-6 seconds keeps
+viewers watching, so give each scene one small step of the idea (a definition, an example, the command,
+what it prints, a common mistake, an interview tip) instead of a few long scenes. The narration ("say")
 is read aloud by a text-to-speech voice, so write it for the ear: short sentences, everyday words,
 no markdown, no emojis, no URLs, no hashtags, and spell out symbols (say "dash p", not "-p").
 Do not say the account handle; the outro screen shows it. All "say" lines together: 70 to 110 words.

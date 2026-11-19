@@ -81,7 +81,10 @@ def test_reel():
     bad["scenes"][0]["say"] = "word " * 50
     bad["hook"]["say"] = "see https://example.com"
     text = " | ".join(checker.reel_rules(bad)[0])
-    assert "narration over 40 words" in text and "link, hashtag" in text, text
+    assert "narration over 25 words" in text and "link, hashtag" in text, text
+    few = copy.deepcopy(REEL)
+    few["scenes"] = few["scenes"][:3]
+    assert any("needs 5-8 short scenes" in e for e in checker.reel_rules(few)[0])
     with tempfile.TemporaryDirectory() as d:
         frames, layout = render_reel.render_frames(REEL, d)
         assert len(frames) == len(REEL["scenes"]) + 2 and layout["overflow"] == [], layout

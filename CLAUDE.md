@@ -72,7 +72,7 @@ must be JPEG.
 - Live so far: Gemini/Groq, Discord, R2 and Instagram all pass `check`; one carousel was published on
   2026-11-12 on the owner's request. The Instagram token is a Facebook-type `EAA...` token, so `instagram.py`
   talks to graph.facebook.com (it picks the host from the token prefix).
-- The owner's PC can switch off any time, so all calendar slots are before 17:00 (11:00 reel, 13:00, 15:30).
+- The owner's PC can switch off any time, so all calendar slots are before 17:00 (11:00 reel, 13:00, 15:30, 16:30 reel from 2026-11-20: "DevOps Interview N/30" series).
 - Stage 2 (done 2026-11-12): Reels are generated like carousels from a JSON script (`writer.write_reel`,
   `checker.reel_rules`). Rows whose topic starts with `FACE REEL` stay manual (owner records them).
   No music: licensed music cannot be added via the API.

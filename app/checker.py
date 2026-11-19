@@ -66,17 +66,18 @@ def reel_rules(post, recent_topics=()):
     if not hook.get("say"):
         err.append("hook narration (say) missing")
     scenes = post.get("scenes") or []
-    if not 3 <= len(scenes) <= 6:
-        err.append(f"needs 3-6 scenes, has {len(scenes)}")
+    # many short scenes (4-6 s each) hold attention better than a few long ones
+    if not 5 <= len(scenes) <= 9:
+        err.append(f"needs 5-8 short scenes, has {len(scenes)}; split or merge ideas")
     for i, s in enumerate(scenes, 2):
         if not s.get("title"):
             err.append(f"scene {i}: title missing")
         if not s.get("say"):
             err.append(f"scene {i}: narration (say) missing")
-        if _words(s.get("say")) > 40:
-            err.append(f"scene {i}: narration over 40 words, shorten it")
-        if _words(s.get("text")) > 22:
-            err.append(f"scene {i}: on-screen text over 22 words")
+        if _words(s.get("say")) > 25:
+            err.append(f"scene {i}: narration over 25 words, split it into two scenes")
+        if _words(s.get("text")) > 14:
+            err.append(f"scene {i}: on-screen text over 14 words")
         lines = (s.get("code") or "").splitlines()
         if len(lines) > 5:
             err.append(f"scene {i}: code over 5 lines")

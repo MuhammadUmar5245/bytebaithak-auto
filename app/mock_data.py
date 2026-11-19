@@ -53,15 +53,19 @@ REEL = {
     "hook": {"kicker": "DEVOPS IN 30s", "title": "Docker in **30 seconds**",
              "say": "Your code works on your laptop but breaks on the server? Docker fixes that."},
     "scenes": [
-        {"title": "Ship the whole box", "text": "Your app plus everything it needs, packed together.",
-         "code": "", "say": "Docker packs your app together with its libraries and settings into one image."},
-        {"title": "Run it anywhere", "text": "A container is a running copy of that image.",
+        {"title": "Ship the whole box", "text": "Your app plus everything it needs.",
+         "code": "", "say": "Docker packs your app with its libraries and settings into one image."},
+        {"title": "Image vs container", "text": "A container is a running copy of an image.",
+         "code": "", "say": "An image is the recipe. A container is that image, running."},
+        {"title": "Start a web server", "text": "One command, one running container.",
          "code": "docker run -d -p 8080:80 nginx",
-         "say": "Run the image and you get a container. This command starts a web server and maps port "
-                "eighty eighty on your machine to port eighty inside."},
-        {"title": "Lighter than a VM", "text": "Containers share the host kernel, so they start in seconds.",
-         "code": "", "say": "Containers share the host's kernel instead of booting a full operating system, "
-                            "so they are light and start fast."},
+         "say": "This command starts the nginx web server in the background."},
+        {"title": "Port mapping", "text": "Host port 8080 goes to container port 80.",
+         "code": "", "say": "Dash p maps port eighty eighty on your machine to port eighty inside."},
+        {"title": "Lighter than a VM", "text": "Containers share the host kernel.",
+         "code": "", "say": "Containers share the host's kernel instead of booting a full operating system."},
+        {"title": "Fast to start", "text": "So they start in seconds.",
+         "code": "", "say": "That is why they are light and start fast."},
     ],
     "outro": {"title": "Save this for later", "say": "Follow for one byte of tech every day, and save this reel."},
     "caption": "Docker in 30 seconds.\n\nAn image is your app plus everything it needs. A container is a running "
